@@ -111,9 +111,25 @@ SELECT version, description, success, installed_on
 FROM flyway_schema_history_protocol ORDER BY installed_rank;
 ```
 
-`baseline-on-migrate` is enabled, so pointing this service at a `ccedb` that already has these tables
-from an earlier monolithic deployment will baseline rather than fail. Verify the existing schema
-matches before relying on that — a baseline records history without checking the columns.
+### Existing databases: no upgrade path yet
+
+`baseline-on-migrate` is enabled, but `baseline-version` is `0` — so on a database that already has
+these tables, Flyway baselines at version 0 and then **still tries to apply V1**, which fails with
+`relation "protocol_definition" already exists`. Verified against PostgreSQL 16; the service does not
+start.
+
+V1 is a greenfield migration. Pointing this service at a `ccedb` carried over from the monolithic
+deployment therefore needs deliberate work, not just a setting:
+
+- Setting `baseline-version: 1` would skip V1, but only records that V1 *was* applied — it does not
+  check the columns. The monolith's schema does **not** match V1 (`step_instance` still has `state`,
+  `completion_status` and `overdue_date`, has no `step_status`, and there is no
+  `step_sla_state_transition` table at all), so baselining alone leaves a schema the services cannot
+  run against.
+- A real upgrade needs forward migrations that rename `state` to `sla_status`, add `step_status`, drop
+  the removed columns, create `step_sla_state_transition`, and backfill it for in-flight steps.
+
+Until those exist, treat this release as greenfield-only and confirm the target `ccedb` is empty.
 
 The service user needs DDL rights on these four tables. It needs **no** rights on the Matcher
 Service's tables; if it has them, that is a wider grant than the design requires.
@@ -149,7 +165,7 @@ that loses it is recoverable. The definitions themselves are not derivable from 
 | Symptom | Likely cause |
 |---|---|
 | Startup fails on Flyway checksum mismatch | `V1` was edited after being applied — never edit an applied migration; add a new one |
-| Startup fails: relation already exists | Existing monolith schema without a baseline — check `baseline-on-migrate` and the existing tables |
+| Startup fails: relation already exists | The target `ccedb` is not empty. V1 is greenfield-only — see [Existing databases](#existing-databases-no-upgrade-path-yet) |
 | `POST` returns `400` "already exists" | That `(url, version)` is loaded — publish a new version rather than overwriting |
 | `DELETE` returns `409` | Patients are enrolled; retire instead ([API Reference](api-reference.md#delete-v1protocolprotocol-definitionsid)) |
 | A newly loaded protocol is not matching events | Expected within the Matcher Service's refresh interval ([Architecture §6](architecture-overview.md#6-cache-invalidation-contract)) |
