@@ -1,0 +1,65 @@
+# ==============================================================================
+# CCE Protocol Service — Application Configuration
+# ==============================================================================
+
+server:
+  port: ${SERVER_PORT:8090}
+
+spring:
+  application:
+    name: cce-protocol-service
+
+  # --- DataSource ---
+  # Shared ccedb. DB_PORT defaults to the standard 5432; set it to 5433 to reach the instance
+  # deployed by cce-collector-service.
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ccedb}
+    username: ${DB_USERNAME:cce_user}
+    password: ${DB_PASSWORD:cce_pass}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+
+  # --- JPA / Hibernate ---
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  # --- Flyway ---
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    out-of-order: true
+    table: flyway_schema_history_protocol
+
+# --- Actuator ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: cce-protocol-service
+
+# --- Logging ---
+logging:
+  level:
+    root: INFO
+    org.hibernate: WARN
+    org.openphc.cce.protocol: INFO
