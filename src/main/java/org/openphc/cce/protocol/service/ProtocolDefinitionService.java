@@ -1,6 +1,5 @@
 package org.openphc.cce.protocol.service;
 
-import org.openphc.cce.common.service.AuditService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,18 +35,15 @@ public class ProtocolDefinitionService {
     private final ProtocolDefinitionRepository protocolDefinitionRepository;
     private final TriggerIndexRepository triggerIndexRepository;
     private final PlanDefinitionParser planDefinitionParser;
-    private final AuditService auditService;
     private final ObjectMapper objectMapper;
 
     public ProtocolDefinitionService(ProtocolDefinitionRepository protocolDefinitionRepository,
                                      TriggerIndexRepository triggerIndexRepository,
                                      PlanDefinitionParser planDefinitionParser,
-                                     AuditService auditService,
                                      ObjectMapper objectMapper) {
         this.protocolDefinitionRepository = protocolDefinitionRepository;
         this.triggerIndexRepository = triggerIndexRepository;
         this.planDefinitionParser = planDefinitionParser;
-        this.auditService = auditService;
         this.objectMapper = objectMapper;
     }
 
@@ -102,11 +98,6 @@ public class ProtocolDefinitionService {
 
         // Audit
         int actionCount = planDefinition.getAction().size();
-        auditService.audit("PROTOCOL_MANAGEMENT", "PROTOCOL_LOADED", "system",
-                "ProtocolDefinition", protocolDefId.toString(),
-                Map.of("url", url, "version", version,
-                        "actionCount", actionCount,
-                        "triggerIndexEntries", indexEntries.size()));
 
         log.info("Loaded protocol definition: {} (id={}, actions={}, indexEntries={})",
                 protocolDef.getCanonical(), protocolDefId, actionCount, indexEntries.size());
@@ -132,9 +123,6 @@ public class ProtocolDefinitionService {
         triggerIndexRepository.deleteByProtocolDefinitionId(id);
 
 
-        auditService.audit("PROTOCOL_MANAGEMENT", "PROTOCOL_RETIRED", "system",
-                "ProtocolDefinition", id.toString(),
-                Map.of("url", protocolDef.getUrl(), "version", protocolDef.getVersion()));
 
         log.info("Retired protocol definition: {} (id={})", protocolDef.getCanonical(), id);
 

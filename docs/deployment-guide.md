@@ -106,7 +106,7 @@ instance.
 ## Database setup
 
 Flyway applies `V1__initial_schema.sql` on startup, creating `protocol_definition`,
-`action_definition`, `trigger_index` and `audit_log` — the four tables this service owns. History is
+`action_definition` and `trigger_index` — the three tables this service owns. History is
 tracked in `flyway_schema_history_protocol`.
 
 ```sql
@@ -135,7 +135,7 @@ deployment therefore needs deliberate work, not just a setting:
 
 Until those exist, treat this release as greenfield-only and confirm the target `ccedb` is empty.
 
-The service user needs DDL rights on these four tables. It needs **no** rights on the Matcher
+The service user needs DDL rights on these three tables. It needs **no** rights on the Matcher
 Service's tables; if it has them, that is a wider grant than the design requires.
 
 ## Health and monitoring
@@ -173,4 +173,4 @@ that loses it is recoverable. The definitions themselves are not derivable from 
 | `POST` returns `400` "already exists" | That `(url, version)` is loaded — publish a new version rather than overwriting |
 | `DELETE` returns `409` | Patients are enrolled; retire instead ([API Reference](api-reference.md#delete-v1protocolprotocol-definitionsid)) |
 | A newly loaded protocol is not matching events | Expected within the Matcher Service's refresh interval ([Architecture §6](architecture-overview.md#6-cache-invalidation-contract)) |
-| `active` gauge dropped unexpectedly | Something was retired or deleted — check `audit_log` for `PROTOCOL_MANAGEMENT` |
+| `active` gauge dropped unexpectedly | Something was retired or deleted — check the service logs for `PROTOCOL_RETIRED` |

@@ -1,6 +1,5 @@
 package org.openphc.cce.protocol.service;
 
-import org.openphc.cce.common.service.AuditService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -35,15 +34,13 @@ class ActionDefinitionServiceTest {
     private ActionDefinitionRepository actionDefinitionRepository;
 
 
-    @Mock
-    private AuditService auditService;
 
     private ActionDefinitionService service;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        service = new ActionDefinitionService(actionDefinitionRepository, auditService);
+        service = new ActionDefinitionService(actionDefinitionRepository);
     }
 
     // ── Create Tests ──
@@ -75,8 +72,6 @@ class ActionDefinitionServiceTest {
             assertEquals(ActionDefinitionKind.CommunicationRequest, result.getActionType());
             assertEquals(definition, result.getDefinition());
 
-            verify(auditService).audit(eq("ACTION_DEFINITION"), eq("ACTION_DEFINITION_CREATED"),
-                    eq("system"), eq("ActionDefinition"), anyString(), anyMap());
         }
 
         @Test
@@ -172,8 +167,6 @@ class ActionDefinitionServiceTest {
             assertEquals("updated-action", result.getName());
             assertEquals(ActionDefinitionKind.ServiceRequest, result.getActionType());
 
-            verify(auditService).audit(eq("ACTION_DEFINITION"), eq("ACTION_DEFINITION_UPDATED"),
-                    eq("system"), eq("ActionDefinition"), eq(id.toString()), anyMap());
         }
 
         @Test
@@ -237,8 +230,6 @@ class ActionDefinitionServiceTest {
             ActionDefinition result = service.retireActionDefinition(id);
 
             assertEquals(ActionDefinitionStatus.RETIRED, result.getStatus());
-            verify(auditService).audit(eq("ACTION_DEFINITION"), eq("ACTION_DEFINITION_RETIRED"),
-                    eq("system"), eq("ActionDefinition"), eq(id.toString()), anyMap());
         }
 
         @Test

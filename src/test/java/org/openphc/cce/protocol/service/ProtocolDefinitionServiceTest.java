@@ -1,6 +1,5 @@
 package org.openphc.cce.protocol.service;
 
-import org.openphc.cce.common.service.AuditService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,8 +43,6 @@ class ProtocolDefinitionServiceTest {
     @Mock
     private PlanDefinitionParser planDefinitionParser;
 
-    @Mock
-    private AuditService auditService;
 
     private ProtocolDefinitionService service;
     private ObjectMapper objectMapper;
@@ -59,7 +56,6 @@ class ProtocolDefinitionServiceTest {
                 protocolDefinitionRepository,
                 triggerIndexRepository,
                 planDefinitionParser,
-                auditService,
                 objectMapper);
 
         try (InputStream is = getClass().getResourceAsStream("/fhir/plan-definition-anc-high-risk.json")) {
@@ -242,7 +238,6 @@ class ProtocolDefinitionServiceTest {
         assertEquals("anc-visit", row.getId().getCodeValue());
         assertEquals(id, row.getId().getProtocolDefinitionId());
         assertEquals("initial-enrollment", row.getId().getActionId());
-        verify(auditService).audit(eq("PROTOCOL_MANAGEMENT"), eq("PROTOCOL_LOADED"), any(), any(), any(), any());
     }
 
     @Test

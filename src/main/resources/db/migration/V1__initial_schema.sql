@@ -12,9 +12,6 @@
 -- (`spring.flyway.table = flyway_schema_history_protocol`), so its migrations are tracked
 -- independently.
 --
--- audit_log is created here because this service has no upstream dependency and is therefore
--- deployed first. All three services write their own rows to it, distinguished by event_category.
---
 -- REPLICA IDENTITY FULL is set on every CDC-replicated table. Publication membership and CDC-user
 -- grants live in data-pipeline/cdc/01-configure-replication.sql, not here.
 -- ==============================================================================
@@ -94,24 +91,3 @@ CREATE TABLE trigger_index (
 
 ALTER TABLE trigger_index REPLICA IDENTITY FULL;
 
--- =============================================
--- 4. audit_log
--- =============================================
-CREATE TABLE audit_log (
-    id                  UUID            NOT NULL DEFAULT gen_random_uuid(),
-    event_category      VARCHAR         NOT NULL,
-    event_type          VARCHAR         NOT NULL,
-    actor               VARCHAR,
-    resource_type       VARCHAR,
-    resource_id         VARCHAR,
-    details             JSONB,
-    timestamp           TIMESTAMPTZ     NOT NULL DEFAULT now(),
-
-    CONSTRAINT audit_log_pkey PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_audit_log_category ON audit_log (event_category);
-CREATE INDEX idx_audit_log_actor ON audit_log (actor);
-CREATE INDEX idx_audit_log_timestamp ON audit_log (timestamp);
-
-ALTER TABLE audit_log REPLICA IDENTITY FULL;

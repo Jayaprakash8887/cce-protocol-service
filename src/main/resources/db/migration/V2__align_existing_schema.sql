@@ -9,7 +9,7 @@
 -- migration reconciles the differences instead.
 --
 -- The definitional tables are otherwise unchanged by the 2.0.0 split — no column of
--- protocol_definition, action_definition, trigger_index or audit_log moved, was renamed, or changed
+-- protocol_definition, action_definition or trigger_index moved, was renamed, or changed
 -- type. All that differs is two indexes V1 deliberately does not create.
 --
 -- On a greenfield database this migration is a no-op: the indexes it drops were never created.

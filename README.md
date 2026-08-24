@@ -4,7 +4,7 @@ The definitional plane of the CCE system. Loads and validates FHIR R4 **PlanDefi
 **ActivityDefinition** resources, derives the trigger index the Matcher Service matches against, and
 manages their lifecycle.
 
-Sole writer of `protocol_definition`, `action_definition`, `trigger_index` and `audit_log`. It
+Sole writer of `protocol_definition`, `action_definition` and `trigger_index`. It
 processes no clinical events and has **no Kafka dependency**.
 
 **Port** `8090` · **Java** 21 · **Spring Boot** 3.4.2 · **Version** 2.0.0

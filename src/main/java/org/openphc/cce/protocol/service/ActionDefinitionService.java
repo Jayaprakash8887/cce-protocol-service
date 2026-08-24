@@ -1,6 +1,5 @@
 package org.openphc.cce.protocol.service;
 
-import org.openphc.cce.common.service.AuditService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.EntityNotFoundException;
 import org.openphc.cce.common.entity.ActionDefinition;
@@ -26,12 +25,9 @@ public class ActionDefinitionService {
     private static final Logger log = LoggerFactory.getLogger(ActionDefinitionService.class);
 
     private final ActionDefinitionRepository actionDefinitionRepository;
-    private final AuditService auditService;
 
-    public ActionDefinitionService(ActionDefinitionRepository actionDefinitionRepository,
-                                   AuditService auditService) {
+    public ActionDefinitionService(ActionDefinitionRepository actionDefinitionRepository) {
         this.actionDefinitionRepository = actionDefinitionRepository;
-        this.auditService = auditService;
     }
 
     /**
@@ -67,9 +63,6 @@ public class ActionDefinitionService {
 
         actionDef = actionDefinitionRepository.save(actionDef);
 
-        auditService.audit("ACTION_DEFINITION", "ACTION_DEFINITION_CREATED", "system",
-                "ActionDefinition", actionDef.getId().toString(),
-                Map.of("canonicalUrl", url, "version", version, "actionType", actionType.name()));
 
         log.info("Created action definition: {} (id={})", actionDef.getCanonical(), actionDef.getId());
 
@@ -101,9 +94,6 @@ public class ActionDefinitionService {
 
         actionDef = actionDefinitionRepository.save(actionDef);
 
-        auditService.audit("ACTION_DEFINITION", "ACTION_DEFINITION_UPDATED", "system",
-                "ActionDefinition", id.toString(),
-                Map.of("canonicalUrl", url, "version", version));
 
         log.info("Updated action definition: {} (id={})", actionDef.getCanonical(), id);
 
@@ -123,9 +113,6 @@ public class ActionDefinitionService {
         actionDef.setStatus(ActionDefinitionStatus.RETIRED);
         actionDef = actionDefinitionRepository.save(actionDef);
 
-        auditService.audit("ACTION_DEFINITION", "ACTION_DEFINITION_RETIRED", "system",
-                "ActionDefinition", id.toString(),
-                Map.of("canonicalUrl", actionDef.getCanonicalUrl(), "version", actionDef.getVersion()));
 
         log.info("Retired action definition: {} (id={})", actionDef.getCanonical(), id);
 

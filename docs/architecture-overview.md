@@ -25,7 +25,6 @@ traffic is measured in loads per month.
 Protocol author ──REST──> Protocol Service ──> protocol_definition
                                           ──> action_definition
                                           ──> trigger_index
-                                          ──> audit_log
 ```
 
 ## 2. Why a load is the expensive moment
@@ -147,13 +146,12 @@ A retired definition is still a row but is no longer matchable, so it is deliber
 
 ## 8. Persistence
 
-Owns the DDL for four tables — `protocol_definition`, `action_definition`, `trigger_index`,
-`audit_log` — in a single Flyway migration, tracked in its own ledger
-(`flyway_schema_history_protocol`).
+Owns the DDL for three tables — `protocol_definition`, `action_definition` and `trigger_index` — in a
+single Flyway migration, tracked in its own ledger (`flyway_schema_history_protocol`).
 
-`audit_log` is created here because this service has no upstream dependency and so is deployed first.
-All services write their own rows to it, distinguished by `event_category`; this service uses
-`PROTOCOL_MANAGEMENT`.
+It once also owned `audit_log`; that table was dropped in 2.0.0, so this service now writes no audit
+rows and the protocol lifecycle is traceable through the service logs and the definition rows' own
+`status` and `updated_at`.
 
 Being first in the deployment order is not incidental — the Matcher Service's migration declares
 foreign keys into `protocol_definition`. See
