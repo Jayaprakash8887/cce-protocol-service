@@ -27,7 +27,11 @@ enough, and horizontal scaling buys availability rather than throughput.
 | `DB_USERNAME` | `cce_user` | **Yes** | Needs DDL rights — it runs Flyway |
 | `DB_PASSWORD` | `cce_pass` | **Yes** | Never leave at the default |
 | `DB_POOL_SIZE` | `20` | No | Can be reduced well below this |
+| `DB_POOL_MIN_IDLE` | `5` | No | HikariCP minimum idle connections |
 | `DB_CONNECTION_TIMEOUT` | `30000` | No | ms |
+| `DB_IDLE_TIMEOUT` | `600000` | No | ms — HikariCP idle connection timeout |
+| `DB_MAX_LIFETIME` | `1800000` | No | ms — HikariCP maximum connection lifetime |
+| `CCE_FLYWAY_BASELINE_VERSION` | `0` | No | `0` for a new database (V1 creates the schema, V2 is a no-op). Set to `1` for the **one-time** deployment against a database that still holds the 1.x pre-split schema, so Flyway records V1 as applied and runs only V2. Return it to `0` afterwards |
 
 ## Docker
 

@@ -44,8 +44,9 @@ spring:
     # holds the 1.x (pre-split) schema. Flyway then records V1 as already applied and runs only V2,
     # which performs the upgrade. Return it to 0 afterwards.
     #
-    # This cannot be inferred from whether the schema is empty: by the time this service migrates, the
-    # Protocol Service has already created its own tables, so the schema is never empty here.
+    # This cannot be inferred from whether the schema is empty. ccedb is shared: the collector service
+    # deploys it and other services may already hold tables in it, so an empty-schema check would not
+    # distinguish a greenfield database from a 1.x one.
     baseline-version: ${CCE_FLYWAY_BASELINE_VERSION:0}
     out-of-order: true
     table: flyway_schema_history_protocol
