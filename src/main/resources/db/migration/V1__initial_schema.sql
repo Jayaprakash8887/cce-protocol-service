@@ -62,9 +62,11 @@ CREATE TABLE action_definition (
     CONSTRAINT action_definition_status_check CHECK (status IN ('ACTIVE', 'RETIRED'))
 );
 
-CREATE INDEX idx_action_definition_status ON action_definition (status) WHERE status = 'ACTIVE';
-CREATE INDEX idx_action_definition_canonical ON action_definition (canonical_url);
-
+-- No secondary indexes. Lookups are by canonical_url, or by canonical_url and version, and
+-- action_definition_url_version_key answers both — canonical_url is its leading column, so a separate
+-- index on it could only duplicate work the unique constraint already does. Nor is one on status worth
+-- having: the table holds tens of rows, so PostgreSQL reads it in a page or two and an index scan never
+-- wins.
 ALTER TABLE action_definition REPLICA IDENTITY FULL;
 
 -- =============================================

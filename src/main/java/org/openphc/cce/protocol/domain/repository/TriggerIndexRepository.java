@@ -36,6 +36,4 @@ public interface TriggerIndexRepository extends JpaRepository<TriggerIndex, Trig
     @Modifying
     @Query("DELETE FROM TriggerIndex t WHERE t.id.protocolDefinitionId = :protocolDefinitionId")
     void deleteByProtocolDefinitionId(@Param("protocolDefinitionId") UUID protocolDefinitionId);
-
-    List<TriggerIndex> findByIdProtocolDefinitionId(UUID protocolDefinitionId);
 }
