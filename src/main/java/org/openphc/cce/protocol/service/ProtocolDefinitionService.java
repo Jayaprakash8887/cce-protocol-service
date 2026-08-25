@@ -96,7 +96,6 @@ public class ProtocolDefinitionService {
                 planDefinitionParser.buildTriggerIndexEntries(planDefinition, protocolDefId));
         triggerIndexRepository.saveAll(indexEntries);
 
-        // Audit
         int actionCount = planDefinition.getAction().size();
 
         log.info("Loaded protocol definition: {} (id={}, actions={}, indexEntries={})",

@@ -50,7 +50,6 @@ flowchart TD
     G -->|yes| H["409-worthy: IllegalArgumentException → 400"]
     G -->|no| I["persist protocol_definition<br/>status = ACTIVE"]
     I --> J["buildTriggerIndexEntries<br/>→ trigger_index rows"]
-    J --> K["audit PROTOCOL_LOADED"]
 ```
 
 Validation happens **before** the duplicate check and before any write, so a malformed definition
@@ -160,9 +159,9 @@ foreign keys into `protocol_definition`. See
 ## 9. Security
 
 No authentication is enforced at the application layer; these are internal endpoints expected to sit
-behind the gateway service. The audit trail records `system` as the actor, which is honest about what
-the service currently knows — wiring a real principal through means changing the audit call sites, not
-adding a new mechanism.
+behind the gateway service. Nothing records who made a change either: `audit_log` was dropped in
+2.0.0 and actor attribution has not yet landed on the definitional tables, so a load or a retirement is
+currently traceable only through the application log.
 
 The write surface is worth noting when placing this service on a network: a caller who can reach
 `POST /v1/protocol/protocol-definitions` can change what every patient in the system is measured
