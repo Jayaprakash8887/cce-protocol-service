@@ -33,8 +33,10 @@ CREATE TABLE protocol_definition (
     CONSTRAINT protocol_definition_status_check CHECK (status IN ('ACTIVE', 'RETIRED'))
 );
 
-CREATE INDEX idx_protocol_definition ON protocol_definition USING GIN (definition jsonb_path_ops);
-
+-- No index on definition. The 1.x schema carried a GIN index over it (jsonb_path_ops) for the trigger
+-- extraction that queried the JSON directly; 2.0.0 extracts triggers into trigger_index at load time
+-- and parses the definition in process, so nothing reaches into the JSONB from SQL. Every read of this
+-- table is by id, (url, version), url or status, which the primary key and the unique constraint serve.
 ALTER TABLE protocol_definition REPLICA IDENTITY FULL;
 
 -- =============================================
