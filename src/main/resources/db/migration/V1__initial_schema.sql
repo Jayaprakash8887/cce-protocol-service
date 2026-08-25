@@ -33,7 +33,7 @@ CREATE TABLE protocol_definition (
     CONSTRAINT protocol_definition_status_check CHECK (status IN ('ACTIVE', 'RETIRED'))
 );
 
-CREATE INDEX idx_protocol_definition_triggers ON protocol_definition USING GIN (definition jsonb_path_ops);
+CREATE INDEX idx_protocol_definition ON protocol_definition USING GIN (definition jsonb_path_ops);
 
 ALTER TABLE protocol_definition REPLICA IDENTITY FULL;
 
