@@ -7,7 +7,7 @@ import org.openphc.cce.common.entity.ProtocolDefinition;
 import org.openphc.cce.common.enums.ProtocolDefinitionStatus;
 import org.openphc.cce.protocol.service.ProtocolDefinitionService;
 import org.openphc.cce.protocol.web.DtoMapper;
-import org.openphc.cce.common.web.GlobalExceptionHandler;
+import org.openphc.cce.common.exception.GlobalExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;

@@ -17,7 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * read these tables directly and pick up changes by polling, so this service publishes no events.
  *
  * <p>scanBasePackages is widened to {@code org.openphc.cce} so the beans cce-common-util
- * contributes (PlanDefinitionParser, ExpressionEvaluationService) are found alongside this
+ * contributes (PlanDefinitionParser, FhirExpressionEvaluator) are found alongside this
  * service's own.
  */
 @SpringBootApplication(scanBasePackages = "org.openphc.cce")

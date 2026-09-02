@@ -8,7 +8,7 @@ import org.openphc.cce.common.enums.ActionDefinitionStatus;
 import org.openphc.cce.common.enums.ActionDefinitionKind;
 import org.openphc.cce.protocol.service.ActionDefinitionService;
 import org.openphc.cce.protocol.web.DtoMapper;
-import org.openphc.cce.common.web.GlobalExceptionHandler;
+import org.openphc.cce.common.exception.GlobalExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;

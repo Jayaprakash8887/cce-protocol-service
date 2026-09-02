@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
  * an otherwise high coverage figure: a bean this service never names in source but needs at runtime.
  * {@code scanBasePackages}, {@code @EntityScan} and {@code @EnableJpaRepositories} are all widened to
  * {@code org.openphc.cce}, so the context also instantiates the components cce-common-util
- * contributes — including {@code ExpressionEvaluationService}, whose constructor requires JSONLogic on
+ * contributes — including {@code FhirExpressionEvaluator}, whose constructor requires JSONLogic on
  * the classpath even though this service evaluates no expressions.
  *
  * <p>H2 with Flyway disabled: the point is bean wiring, not the schema, which the owning migrations
