@@ -72,6 +72,7 @@ never leaves a partial row behind.
 | The `cycle-boundary` extension on an action that is not a group, or with a code other than `calendar-day` or `entry-step` | reject | Only a group repeats in cycles, and an unknown code names a cycle no service can open |
 | A `calendar-day` group inside another repeating group | reject | Every event of one visit falls on the same day, so the inner group could never start a second cycle; it repeats by `entry-step` instead |
 | An `entry-step` group with no entry step (every step directly in it waits on another step inside it) | reject | A new cycle opens when an entry step repeats, so without one no new cycle could ever start |
+| The `cycle-entry-step` extension on anything but an `entry-step` group, without a `valueId`, or naming anything but a step directly in the group with no predecessor inside it | reject | Only an `entry-step` group has entry steps, and a named step that is not the group's own, or that waits on another step in it, could never start a cycle |
 | `timing` on a group, `tolerance-days` on a group, a `fire-event` child of a group, or any action that follows a group | reject, until built | Scheduled repeats, group deadlines, intelligence on groups and group completion are not built yet. Refusing them means an author never believes one is in effect. Each check is lifted when its feature ships |
 | `concurrent-*` relatedAction | **warn** | Establishes no ordering; previously accepted, so rejecting would break an upstream publisher |
 | `relatedAction` naming an unknown action | **warn** | Same |
