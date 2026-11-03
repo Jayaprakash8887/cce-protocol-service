@@ -6,7 +6,7 @@
   "name": "PatientJourney",
   "title": "Outpatient journey with visit-driven repeats",
   "status": "active",
-  "description": "Fixture for visit-driven step groups: a journey that repeats by calendar-day, holding a check-in and a Consultation that repeats by entry-step. History is the Consultation's entry step; examination follows it.",
+  "description": "Fixture for visit-driven step groups: a journey that repeats by calendar-day, holding a check-in and a Consultation that repeats by entry-step, naming history as its entry step; examination follows it.",
   "action": [
     {
       "id": "journey",
@@ -72,6 +72,10 @@
             {
               "url": "http://openphc.org/fhir/StructureDefinition/cycle-boundary",
               "valueCode": "entry-step"
+            },
+            {
+              "url": "http://openphc.org/fhir/StructureDefinition/cycle-entry-step",
+              "valueId": "history"
             }
           ],
           "type": {
