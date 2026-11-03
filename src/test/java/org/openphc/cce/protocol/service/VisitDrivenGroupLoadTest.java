@@ -105,8 +105,22 @@ class VisitDrivenGroupLoadTest {
     }
 
     @Test
-    void loadProtocol_entryStepGroupWithNoEntryStep_isRejected() {
-        // History waiting on the examination as well makes a cycle with no step to start it.
+    void loadProtocol_entryStepGroupNamingNoEntryStep_isRejected() {
+        String json = journeyJson.replace(
+                ",\n            {\n              \"url\": \"http://openphc.org/fhir/StructureDefinition/cycle-entry-step\",\n"
+                        + "              \"valueId\": \"history\"\n            }", "");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.loadProtocol(json));
+        assertTrue(ex.getMessage().contains("'consultation' repeats by entry-step but names no entry step"),
+                ex.getMessage());
+
+        verify(protocolDefinitionRepository, never()).save(any());
+    }
+
+    @Test
+    void loadProtocol_entryStepThatWaitsInsideItsGroup_isRejected() {
+        // History waiting on the examination could never start a cycle.
         String json = journeyJson.replace(
                 "\"id\": \"history\",\n              \"title\": \"History\",",
                 "\"id\": \"history\",\n              \"title\": \"History\",\n"
@@ -114,7 +128,7 @@ class VisitDrivenGroupLoadTest {
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.loadProtocol(json));
-        assertTrue(ex.getMessage().contains("'consultation' repeats by entry-step but has no entry step"),
+        assertTrue(ex.getMessage().contains("'consultation' names 'history' as its entry step, but it waits on another action inside the group"),
                 ex.getMessage());
 
         verify(protocolDefinitionRepository, never()).save(any());
