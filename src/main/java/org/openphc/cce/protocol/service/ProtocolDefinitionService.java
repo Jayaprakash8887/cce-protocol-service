@@ -232,16 +232,11 @@ public class ProtocolDefinitionService {
     }
 
     /**
-     * Warn about {@code relatedAction} entries that don't do what they seem to:
-     * <ul>
-     *   <li>one naming an action the protocol doesn't have. It sets no order, so no step is created
-     *       after it and no order is checked;</li>
-     *   <li>an offset on a step inside a {@code calendar-day} group, to an action outside it. It sets no
-     *       due date.</li>
-     * </ul>
+     * Warn about a {@code relatedAction} naming an action the protocol doesn't have. It sets no order, so
+     * no step is created after it and no order is checked.
      *
-     * <p>Warnings rather than refusals: both were accepted before, so refusing them now would break a
-     * system that already sends such protocols.
+     * <p>A warning rather than a refusal: it was accepted before, so refusing it now would break a system
+     * that already sends such protocols.
      */
     private void warnOnInertRelatedActions(PlanDefinition planDefinition) {
         List<PlanDefinitionParser.StepMetadata> steps = planDefinitionParser.extractSteps(planDefinition);
@@ -251,14 +246,6 @@ public class ProtocolDefinitionService {
             log.warn("Protocol {} has a relatedAction naming an action that does not exist — it is "
                             + "ignored and establishes no ordering: {}",
                     planDefinition.getUrl(), dangling);
-        }
-
-        for (String ignored : PlanDefinitionParser.findOffsetsIgnoredInCalendarDayGroups(steps, groups)) {
-            log.warn("Protocol {} has a relatedAction offset that sets no due date. A step in a calendar-day "
-                            + "group is created when its visit opens, with the visit's due date; the relatedAction "
-                            + "still sets which step comes first. To give the first visit a deadline, put the "
-                            + "relatedAction on the calendar-day group: {}",
-                    planDefinition.getUrl(), ignored);
         }
     }
 }

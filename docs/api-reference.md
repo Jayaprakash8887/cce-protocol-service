@@ -61,7 +61,7 @@ reaching a Jackson read.
 
 `url` and `version` are read from the resource, not from the request — the definition names itself.
 
-Validation warnings (a `relatedAction` naming an unknown action, and an offset that sets no due date in a `calendar-day` group) do **not** affect the response. A `relatedAction` relationship other than `after-end` is an error, and the load fails.
+A validation warning (a `relatedAction` naming an unknown action) does **not** affect the response. A `relatedAction` relationship other than `after-end` is an error, and the load fails.
 They are logged; the load succeeds.
 
 ### `GET /v1/protocol/protocol-definitions`

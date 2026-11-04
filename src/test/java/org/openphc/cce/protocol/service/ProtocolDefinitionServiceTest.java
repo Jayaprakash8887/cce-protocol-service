@@ -319,32 +319,6 @@ class ProtocolDefinitionServiceTest {
     }
 
     @Test
-    void loadProtocol_warnsButStillLoadsWhenAnOffsetInACalendarDayGroupSetsNoDueDate() {
-        PlanDefinition planDef = mockPlanDefinitionMinimal("http://openphc.org/test", "1.0.0");
-        when(planDefinitionParser.parse(planDefinitionJson)).thenReturn(planDef);
-        when(protocolDefinitionRepository.findByUrlAndVersion(any(), any())).thenReturn(Optional.empty());
-        when(protocolDefinitionRepository.save(any())).thenAnswer(i -> {
-            ProtocolDefinition d = i.getArgument(0);
-            d.setId(UUID.randomUUID());
-            return d;
-        });
-        PlanDefinitionParser.StepMetadata registration = new PlanDefinitionParser.StepMetadata(
-                "registration", "Registration", List.of(), List.of(), null, null, "must", List.of());
-        PlanDefinitionParser.StepMetadata consent = new PlanDefinitionParser.StepMetadata(
-                "consent", "Consent", List.of(),
-                List.of(new PlanDefinitionParser.RelatedStepInfo("registration", "after-end", java.math.BigDecimal.TWO, "d")),
-                null, null, "must", List.of(), "journey");
-        PlanDefinitionParser.GroupMetadata journey = new PlanDefinitionParser.GroupMetadata("journey", "Journey",
-                null, List.of(), null, null, "must", null, org.openphc.cce.common.enums.CycleBoundary.CALENDAR_DAY,
-                null, List.of());
-        when(planDefinitionParser.extractSteps(planDef)).thenReturn(List.of(registration, consent));
-        when(planDefinitionParser.extractGroups(planDef)).thenReturn(List.of(journey));
-
-        assertDoesNotThrow(() -> service.loadProtocol(planDefinitionJson));
-        verify(protocolDefinitionRepository).save(any());
-    }
-
-    @Test
     void retireProtocol_marksRetiredAndStopsItMatching() {
         UUID id = UUID.randomUUID();
         ProtocolDefinition def = buildProtocolDefinition(id, ProtocolDefinitionStatus.ACTIVE);
