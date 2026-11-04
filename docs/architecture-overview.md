@@ -47,7 +47,7 @@ flowchart TD
     D --> E["validateTriggers<br/>reject a trigger with neither data[] nor condition,<br/>or a codeFilter.path no event is read for"]
     E --> EG["validateGroups<br/>step groups that cannot work, and group features not built yet"]
     EG --> E2["validateOptionalStepDeadlines<br/>no tolerance-days on a non-must action"]
-    E2 --> F["warn on inert relatedActions<br/>concurrent-* and dangling edges"]
+    E2 --> F["warn on inert relatedActions<br/>concurrent-* and dangling edges,<br/>offsets that set no due date in a calendar-day group"]
     F --> G{"(url, version)<br/>already loaded?"}
     G -->|yes| H["409-worthy: IllegalArgumentException → 400"]
     G -->|no| I["persist protocol_definition<br/>status = ACTIVE"]
@@ -76,6 +76,7 @@ never leaves a partial row behind.
 | `timing` on a group, `tolerance-days` on a group, a `fire-event` child of a group, or any action that follows a group | reject, until built | Scheduled repeats, group deadlines, intelligence on groups and group completion are not built yet. Refusing them means an author never believes one is in effect. Each check is lifted when its feature ships |
 | `concurrent-*` relatedAction | **warn** | Establishes no ordering; previously accepted, so rejecting would break an upstream publisher |
 | `relatedAction` naming an unknown action | **warn** | Same |
+| A step inside a `calendar-day` group with a non-zero `relatedAction` offset to an action outside it | **warn** | The edge still orders the step, but the offset sets no due date: each visit creates the step with the visit's due date. Put the `relatedAction` on the group to give the first visit a deadline |
 | Body that the FHIR parser accepts but Jackson cannot re-read | reject | Nothing storable — fails rather than persisting an empty definition body |
 
 The two warning cases are logged at load and are otherwise inert at runtime. The direction rules that

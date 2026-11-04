@@ -233,7 +233,8 @@ public class ProtocolDefinitionService {
      * Warn about {@code relatedAction} entries that establish no step ordering, so a protocol that
      * expects one to sequence its steps is flagged at load time rather than quietly producing a
      * disconnected graph — no progressive instantiation, no ORDER_VIOLATION, no backfill along that
-     * edge, and no error to explain why.
+     * edge, and no error to explain why. Also warn about an offset that sets no due date: one on a step
+     * inside a {@code calendar-day} group, to an action outside it.
      *
      * <p>Warnings rather than rejections: both shapes were accepted (and equally inert) before, so
      * failing the load would break an upstream publisher for something already in the wild.
@@ -253,6 +254,14 @@ public class ProtocolDefinitionService {
                             + "will NOT sequence these steps. Use after-*/before-* if one must "
                             + "follow the other: {}",
                     planDefinition.getUrl(), unordered);
+        }
+
+        for (String ignored : PlanDefinitionParser.findOffsetsIgnoredInCalendarDayGroups(steps, groups)) {
+            log.warn("Protocol {} has a relatedAction offset that sets no due date. A step in a calendar-day "
+                            + "group is created when its visit opens, with the visit's due date; the edge still "
+                            + "orders it. To give the first visit a deadline, put the relatedAction on the "
+                            + "calendar-day group: {}",
+                    planDefinition.getUrl(), ignored);
         }
     }
 }
