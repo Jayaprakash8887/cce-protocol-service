@@ -91,7 +91,7 @@ accepted under the old rules. A new **rejection** is effectively a breaking chan
 whose definitions are already in the database — `POST` will start failing for content that used to
 work, and `rebuild-index` will fail for stored definitions.
 
-Prefer a warning (as `concurrent-*` and dangling `relatedAction`s are handled) unless the definition
+Prefer a warning (as a `relatedAction` naming an unknown action is handled) unless the definition
 genuinely cannot function. The rejection/warning split and its reasoning are in
 [Architecture §3](architecture-overview.md#rejections-versus-warnings).
 

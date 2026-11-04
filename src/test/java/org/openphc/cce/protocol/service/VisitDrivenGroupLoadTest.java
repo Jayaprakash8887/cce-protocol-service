@@ -87,7 +87,7 @@ class VisitDrivenGroupLoadTest {
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.loadProtocol(json));
-        assertTrue(ex.getMessage().contains("'consultation' repeats by calendar-day inside another repeating group"),
+        assertTrue(ex.getMessage().contains("'consultation' repeats by calendar-day inside a group that repeats by calendar-day"),
                 ex.getMessage());
 
         verify(protocolDefinitionRepository, never()).save(any());

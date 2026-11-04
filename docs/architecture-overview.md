@@ -47,7 +47,8 @@ flowchart TD
     D --> E["validateTriggers<br/>reject a trigger with neither data[] nor condition,<br/>or a codeFilter.path no event is read for"]
     E --> EG["validateGroups<br/>step groups that cannot work, and group features not built yet"]
     EG --> E2["validateOptionalStepDeadlines<br/>no tolerance-days on a non-must action"]
-    E2 --> F["warn on inert relatedActions<br/>concurrent-* and dangling edges"]
+    E2 --> E3["validateRelationships<br/>only after-end relatedActions"]
+    E3 --> F["warn on a relatedAction<br/>naming an unknown action"]
     F --> G{"(url, version)<br/>already loaded?"}
     G -->|yes| H["409-worthy: IllegalArgumentException → 400"]
     G -->|no| I["persist protocol_definition<br/>status = ACTIVE"]
@@ -70,16 +71,17 @@ never leaves a partial row behind.
 | A step group (`groupingBehavior: logical-group`) with a trigger, with no step inside it, on a `fire-event` action, or with a `selectionBehavior` other than `all` | reject | A group is never matched to an event, completes when its mandatory steps are done, and has members; any of these would describe a group that can't work |
 | `tolerance-days` on an optional group, or on a group with the `cycle-boundary` extension | reject | Nothing is required of an optional group, and a visit-driven cycle has no planned due date, so either deadline would enforce nothing |
 | The `cycle-boundary` extension on an action that is not a group, or with a code other than `calendar-day` or `entry-step` | reject | Only a group repeats in cycles, and an unknown code names a cycle no service can open |
-| A `calendar-day` group inside another repeating group | reject | Every event of one visit falls on the same day, so the inner group could never start a second cycle; it repeats by `entry-step` instead |
+| A `calendar-day` group inside another `calendar-day` group, at any depth | reject | Every event of one visit falls on the same day, so the inner group could never start a second cycle. It can repeat by `entry-step` instead. Inside an `entry-step` group, whose cycle can span many days, a `calendar-day` group is allowed |
 | An `entry-step` group without exactly one `cycle-entry-step` extension, or one with no `valueId` | reject | A new cycle opens when the group's entry step repeats, so the group must name exactly one |
 | A `cycle-entry-step` naming anything but a step inside the group (directly or in a nested group) with no predecessor inside it, or on any action that is not an `entry-step` group | reject | A step outside the group, or one that waits on another action in it, could never start a cycle. Only an `entry-step` group has an entry step |
 | `timing` on a group, `tolerance-days` on a group, a `fire-event` child of a group, or any action that follows a group | reject, until built | Scheduled repeats, group deadlines, intelligence on groups and group completion are not built yet. Refusing them means an author never believes one is in effect. Each check is lifted when its feature ships |
-| `concurrent-*` relatedAction | **warn** | Establishes no ordering; previously accepted, so rejecting would break an upstream publisher |
-| `relatedAction` naming an unknown action | **warn** | Same |
+| A `relatedAction` relationship other than `after-end` (`after`, `after-start`, `before-*`, `concurrent-*`) | reject | `after-end` is the only supported relationship, and the default when none is given. One way of writing the order is easier to read and can't be read backwards. Write the `relatedAction` on the later step, naming the step it follows. Protocols stored earlier keep working |
+| `relatedAction` naming an unknown action | **warn** | It sets no order. It was accepted before, so refusing it now would break an upstream publisher |
 | Body that the FHIR parser accepts but Jackson cannot re-read | reject | Nothing storable — fails rather than persisting an empty definition body |
 
-The two warning cases are logged at load and are otherwise inert at runtime. The direction rules that
-make an edge meaningful are in
+The warning is logged at load, and the load still succeeds. A `relatedAction` naming an unknown action does nothing at runtime.
+
+How `relatedAction` decides which step comes first is explained in
 [FHIR Conformance §1](https://github.com/openphc/cce-common-util/blob/release-2.0.0/docs/fhir-conformance.md#1-relatedaction-direction).
 
 ## 4. The trigger index

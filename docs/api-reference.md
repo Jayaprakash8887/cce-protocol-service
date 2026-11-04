@@ -61,7 +61,7 @@ reaching a Jackson read.
 
 `url` and `version` are read from the resource, not from the request — the definition names itself.
 
-Validation warnings (`concurrent-*` and dangling `relatedAction`s) do **not** affect the response.
+A validation warning (a `relatedAction` naming an unknown action) does **not** affect the response. A `relatedAction` relationship other than `after-end` is an error, and the load fails.
 They are logged; the load succeeds.
 
 ### `GET /v1/protocol/protocol-definitions`

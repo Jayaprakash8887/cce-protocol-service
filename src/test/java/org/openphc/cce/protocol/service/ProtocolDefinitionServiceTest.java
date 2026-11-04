@@ -293,12 +293,13 @@ class ProtocolDefinitionServiceTest {
         verify(planDefinitionParser).validateTriggers(planDef);
         verify(planDefinitionParser).validateGroups(planDef);
         verify(planDefinitionParser).validateOptionalStepDeadlines(planDef);
+        verify(planDefinitionParser).validateRelationships(planDef);
     }
 
     @Test
     void loadProtocol_warnsButStillLoadsWhenAnEdgeIsInert() {
-        // A concurrent-* or dangling relatedAction establishes no ordering. That is reported, not fatal:
-        // both shapes were accepted before, so rejecting would break an upstream publisher.
+        // A relatedAction naming an unknown action sets no order. That is reported, not fatal: it was
+        // accepted before, so refusing it would break an upstream publisher.
         PlanDefinition planDef = mockPlanDefinitionMinimal("http://openphc.org/test", "1.0.0");
         when(planDefinitionParser.parse(planDefinitionJson)).thenReturn(planDef);
         when(protocolDefinitionRepository.findByUrlAndVersion(any(), any())).thenReturn(Optional.empty());
@@ -309,7 +310,7 @@ class ProtocolDefinitionServiceTest {
         });
         PlanDefinitionParser.StepMetadata step = new PlanDefinitionParser.StepMetadata(
                 "a", "A", List.of(),
-                List.of(new PlanDefinitionParser.RelatedStepInfo("ghost", "concurrent", null, null)),
+                List.of(new PlanDefinitionParser.RelatedStepInfo("ghost", "after-end", null, null)),
                 null, null, null, List.of());
         when(planDefinitionParser.extractSteps(planDef)).thenReturn(List.of(step));
 

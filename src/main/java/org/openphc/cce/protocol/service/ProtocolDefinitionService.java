@@ -66,6 +66,8 @@ public class ProtocolDefinitionService {
         // here rather than ignored downstream: an author who writes tolerance-days on an optional
         // action believes a deadline is being enforced, and nothing later would tell them otherwise.
         planDefinitionParser.validateOptionalStepDeadlines(planDefinition);
+        // after-end is the only supported relatedAction relationship; no relationship means after-end.
+        planDefinitionParser.validateRelationships(planDefinition);
         warnOnInertRelatedActions(planDefinition);
 
         String url = planDefinition.getUrl();
@@ -230,13 +232,11 @@ public class ProtocolDefinitionService {
     }
 
     /**
-     * Warn about {@code relatedAction} entries that establish no step ordering, so a protocol that
-     * expects one to sequence its steps is flagged at load time rather than quietly producing a
-     * disconnected graph — no progressive instantiation, no ORDER_VIOLATION, no backfill along that
-     * edge, and no error to explain why.
+     * Warn about a {@code relatedAction} naming an action the protocol doesn't have. It sets no order, so
+     * no step is created after it and no order is checked.
      *
-     * <p>Warnings rather than rejections: both shapes were accepted (and equally inert) before, so
-     * failing the load would break an upstream publisher for something already in the wild.
+     * <p>A warning rather than a refusal: it was accepted before, so refusing it now would break a system
+     * that already sends such protocols.
      */
     private void warnOnInertRelatedActions(PlanDefinition planDefinition) {
         List<PlanDefinitionParser.StepMetadata> steps = planDefinitionParser.extractSteps(planDefinition);
@@ -246,13 +246,6 @@ public class ProtocolDefinitionService {
             log.warn("Protocol {} has a relatedAction naming an action that does not exist — it is "
                             + "ignored and establishes no ordering: {}",
                     planDefinition.getUrl(), dangling);
-        }
-
-        for (String unordered : PlanDefinitionParser.findUnorderedRelationships(steps, groups)) {
-            log.warn("Protocol {} has a concurrent-* relatedAction, which states no ordering — it "
-                            + "will NOT sequence these steps. Use after-*/before-* if one must "
-                            + "follow the other: {}",
-                    planDefinition.getUrl(), unordered);
         }
     }
 }
