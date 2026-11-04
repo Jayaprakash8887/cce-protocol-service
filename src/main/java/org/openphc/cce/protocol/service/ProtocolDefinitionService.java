@@ -258,9 +258,9 @@ public class ProtocolDefinitionService {
 
         for (String ignored : PlanDefinitionParser.findOffsetsIgnoredInCalendarDayGroups(steps, groups)) {
             log.warn("Protocol {} has a relatedAction offset that sets no due date. A step in a calendar-day "
-                            + "group is created when its visit opens, with the visit's due date; the edge still "
-                            + "orders it. To give the first visit a deadline, put the relatedAction on the "
-                            + "calendar-day group: {}",
+                            + "group is created when its visit opens, with the visit's due date; the relatedAction "
+                            + "still sets which step comes first. To give the first visit a deadline, put the "
+                            + "relatedAction on the calendar-day group: {}",
                     planDefinition.getUrl(), ignored);
         }
     }

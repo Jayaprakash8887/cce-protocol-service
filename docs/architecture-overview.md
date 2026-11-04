@@ -76,11 +76,14 @@ never leaves a partial row behind.
 | `timing` on a group, `tolerance-days` on a group, a `fire-event` child of a group, or any action that follows a group | reject, until built | Scheduled repeats, group deadlines, intelligence on groups and group completion are not built yet. Refusing them means an author never believes one is in effect. Each check is lifted when its feature ships |
 | `concurrent-*` relatedAction | **warn** | Establishes no ordering; previously accepted, so rejecting would break an upstream publisher |
 | `relatedAction` naming an unknown action | **warn** | Same |
-| A step inside a `calendar-day` group with a non-zero `relatedAction` offset to an action outside it | **warn** | The edge still orders the step, but the offset sets no due date: each visit creates the step with the visit's due date. Put the `relatedAction` on the group to give the first visit a deadline |
+| A step inside a `calendar-day` group with a non-zero `relatedAction` offset to an action outside it. Example: a consent inside a daily patient journey, "2 days after registration", where registration is outside the journey | **warn** | The `relatedAction` still says which step comes first. But its offset is not used: a visit starts only when the patient comes, and creates the consent with the visit's own due date. To give the first visit a deadline, put the `relatedAction` on the journey itself |
 | Body that the FHIR parser accepts but Jackson cannot re-read | reject | Nothing storable — fails rather than persisting an empty definition body |
 
-The two warning cases are logged at load and are otherwise inert at runtime. The direction rules that
-make an edge meaningful are in
+The three warnings are logged at load, and the load still succeeds:
+- A `concurrent-*` `relatedAction`, or one naming an unknown action, does nothing at runtime.
+- An offset inside a `calendar-day` group is partly used: the order between the two steps still holds, but no due date comes from the offset.
+
+How `relatedAction` decides which step comes first is explained in
 [FHIR Conformance §1](https://github.com/openphc/cce-common-util/blob/release-2.0.0/docs/fhir-conformance.md#1-relatedaction-direction).
 
 ## 4. The trigger index
