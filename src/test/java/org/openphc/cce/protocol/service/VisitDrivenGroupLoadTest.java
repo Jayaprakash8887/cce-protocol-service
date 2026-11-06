@@ -94,6 +94,19 @@ class VisitDrivenGroupLoadTest {
     }
 
     @Test
+    void loadProtocol_groupDeclaringRequiredBehavior_isRejected_everyGroupIsOptionalForNow() {
+        String json = journeyJson.replace("\"groupingBehavior\": \"logical-group\",",
+                "\"groupingBehavior\": \"logical-group\", \"requiredBehavior\": \"must\",");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.loadProtocol(json));
+        assertTrue(ex.getMessage().contains("Group 'journey' declares requiredBehavior 'must'. Mandatory groups "
+                + "are not supported yet"), ex.getMessage());
+
+        verify(protocolDefinitionRepository, never()).save(any());
+    }
+
+    @Test
     void loadProtocol_unknownCycleBoundary_isRejected() {
         String json = journeyJson.replace("\"valueCode\": \"entry-step\"", "\"valueCode\": \"encounter\"");
 

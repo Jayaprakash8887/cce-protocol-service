@@ -11,7 +11,6 @@
     {
       "id": "journey",
       "title": "Patient journey",
-      "requiredBehavior": "must",
       "groupingBehavior": "logical-group",
       "extension": [
         {
@@ -66,7 +65,6 @@
         {
           "id": "consultation",
           "title": "Consultation",
-          "requiredBehavior": "must",
           "groupingBehavior": "logical-group",
           "extension": [
             {
